@@ -18,7 +18,7 @@ module.exports.getUser = (req, res) => {
   User.findById(req.params.id)
     .then((user) => {
       if (!user) {
-        return res.status(NOT_FOUND_CODE).send({ message: STATUS.USER_NOT_FOUND });
+        return res.status(INVALID_DATA_CODE).send({ message: STATUS.USER_NOT_FOUND });
       }
       return res.status(200).send(user);
     })
