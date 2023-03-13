@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const userRouter = require('./routes/user');
 const cardRouter = require('./routes/card');
+const STATUS = require('./utils/constants/status');
+const { INVALID_DATA_CODE } = require('./utils/constants/status-code');
 
 const { PORT = 3000 } = process.env;
 
@@ -23,6 +25,7 @@ app.use((req, res, next) => {
 
 app.use('/users', userRouter);
 app.use('/cards', cardRouter);
+app.use('*', (req, res) => res.status(INVALID_DATA_CODE).send({ message: STATUS.NOT_FOUND }));
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);

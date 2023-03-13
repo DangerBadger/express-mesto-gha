@@ -40,7 +40,12 @@ module.exports.deleteCard = (req, res) => {
       }
       return res.status(200).send({ message: 'Карточка удалена' });
     })
-    .catch(() => res.status(DEFAULT_CODE).send({ message: STATUS.DEFAULT_ERROR }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return res.status(INVALID_DATA_CODE).send({ message: STATUS.INVALID_CARD });
+      }
+      return res.status(DEFAULT_CODE).send({ message: STATUS.DEFAULT_ERROR });
+    });
 };
 
 module.exports.likeCard = (req, res) => {
