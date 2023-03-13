@@ -18,13 +18,13 @@ module.exports.getUser = (req, res) => {
   User.findById(req.params.id)
     .then((user) => {
       if (!user) {
-        return res.status(INVALID_DATA_CODE).send({ message: STATUS.USER_NOT_FOUND });
+        return res.status(NOT_FOUND_CODE).send({ message: STATUS.USER_NOT_FOUND });
       }
       return res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(NOT_FOUND_CODE).send({ message: STATUS.BAD_REQUEST });
+        return res.status(INVALID_DATA_CODE).send({ message: STATUS.BAD_REQUEST });
       }
       return res.status(DEFAULT_CODE).send({ message: STATUS.DEFAULT_ERROR });
     });
