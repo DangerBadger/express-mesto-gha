@@ -16,7 +16,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-mongoose.connect(process.env.MESTO_DB_CONNECT);
+mongoose.connect(process.env.MESTO_DB_CONNECT); // Тест ругается на отсутсвие URI
 
 app.use((req, res, next) => {
   req.user = {
