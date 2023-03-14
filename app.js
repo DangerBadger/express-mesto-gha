@@ -10,13 +10,14 @@ const { NOT_FOUND_CODE } = require('./utils/constants/status-code');
 require('dotenv').config();
 
 const { PORT = 3000 } = process.env;
+const { MESTO_DB_CONNECT = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
 
 const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-mongoose.connect(process.env.MESTO_DB_CONNECT); // Тест ругается на отсутсвие URI
+mongoose.connect(MESTO_DB_CONNECT); // Тест ругается на отсутсвие URI
 
 app.use((req, res, next) => {
   req.user = {
