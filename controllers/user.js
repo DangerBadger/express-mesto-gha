@@ -45,7 +45,7 @@ module.exports.createUser = (req, res) => {
     });
 };
 
-module.exports.updateUser = (req, res) => {
+module.exports.updateUserInfo = (req, res) => {
   const { name, about } = req.body;
   const { _id } = req.user;
 
@@ -77,7 +77,7 @@ module.exports.updateAvatar = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(INVALID_DATA_CODE).send({ message: STATUS.INVALID_USER });
+        return res.status(INVALID_DATA_CODE).send({ message: STATUS.INVALID_AVATAR_UPDATE });
       }
       return res.status(DEFAULT_CODE).send({ message: STATUS.DEFAULT_ERROR });
     });

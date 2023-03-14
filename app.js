@@ -6,6 +6,9 @@ const cardRouter = require('./routes/card');
 const STATUS = require('./utils/constants/status');
 const { NOT_FOUND_CODE } = require('./utils/constants/status-code');
 
+// Подключение библиотеки для чтения переменных окружения из .env
+require('dotenv').config();
+
 const { PORT = 3000 } = process.env;
 
 const app = express();
@@ -13,7 +16,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
+mongoose.connect(process.env.MESTO_DB_CONNECT);
 
 app.use((req, res, next) => {
   req.user = {

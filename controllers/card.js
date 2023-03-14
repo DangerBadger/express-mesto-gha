@@ -24,7 +24,7 @@ module.exports.createCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(INVALID_DATA_CODE).send({ message: STATUS.INVALID_CARD });
+        return res.status(INVALID_DATA_CODE).send({ message: STATUS.INVALID_CARD_CREATE });
       }
       return res.status(DEFAULT_CODE).send({ message: STATUS.DEFAULT_ERROR });
     });
@@ -64,7 +64,7 @@ module.exports.likeCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(INVALID_DATA_CODE).send({ message: STATUS.BAD_REQUEST });
+        return res.status(INVALID_DATA_CODE).send({ message: STATUS.BAD_LIKE_REQ });
       }
       return res.status(DEFAULT_CODE).send({ message: STATUS.DEFAULT_ERROR });
     });
@@ -86,7 +86,7 @@ module.exports.dislikeCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(INVALID_DATA_CODE).send({ message: STATUS.BAD_REQUEST });
+        return res.status(INVALID_DATA_CODE).send({ message: STATUS.BAD_LIKE_REQ });
       }
       return res.status(DEFAULT_CODE).send({ message: STATUS.DEFAULT_ERROR });
     });
