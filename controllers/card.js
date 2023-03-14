@@ -3,13 +3,14 @@ const {
   DEFAULT_CODE,
   NOT_FOUND_CODE,
   INVALID_DATA_CODE,
+  OK,
 } = require('../utils/constants/status-code');
 const Card = require('../models/card');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
     .then((card) => {
-      res.status(200).send(card);
+      res.status(OK).send(card);
     })
     .catch(() => res.status(DEFAULT_CODE).send({ message: STATUS.DEFAULT_ERROR }));
 };
@@ -20,7 +21,7 @@ module.exports.createCard = (req, res) => {
 
   Card.create({ name, link, owner })
     .then((card) => {
-      res.status(200).send(card);
+      res.status(OK).send(card);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -38,11 +39,11 @@ module.exports.deleteCard = (req, res) => {
       if (!card) {
         return res.status(NOT_FOUND_CODE).send({ message: STATUS.CARD_NOT_FOUND });
       }
-      return res.status(200).send({ message: 'Карточка удалена' });
+      return res.status(OK).send({ message: 'Карточка удалена' });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(INVALID_DATA_CODE).send({ message: STATUS.INVALID_CARD });
+        return res.status(INVALID_DATA_CODE).send({ message: STATUS.BAD_REQUEST });
       }
       return res.status(DEFAULT_CODE).send({ message: STATUS.DEFAULT_ERROR });
     });
@@ -60,7 +61,7 @@ module.exports.likeCard = (req, res) => {
       if (!card) {
         return res.status(NOT_FOUND_CODE).send({ message: STATUS.CARD_NOT_FOUND });
       }
-      return res.status(200).send(card);
+      return res.status(OK).send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -82,7 +83,7 @@ module.exports.dislikeCard = (req, res) => {
       if (!card) {
         return res.status(NOT_FOUND_CODE).send({ message: STATUS.CARD_NOT_FOUND });
       }
-      return res.status(200).send(card);
+      return res.status(OK).send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {

@@ -3,13 +3,14 @@ const {
   DEFAULT_CODE,
   NOT_FOUND_CODE,
   INVALID_DATA_CODE,
+  OK,
 } = require('../utils/constants/status-code');
 const User = require('../models/user');
 
 module.exports.getUsers = (req, res) => {
   User.find({})
     .then((user) => {
-      res.status(200).send(user);
+      res.status(OK).send(user);
     })
     .catch(() => res.status(DEFAULT_CODE).send({ message: STATUS.DEFAULT_ERROR }));
 };
@@ -20,7 +21,7 @@ module.exports.getUser = (req, res) => {
       if (!user) {
         return res.status(NOT_FOUND_CODE).send({ message: STATUS.USER_NOT_FOUND });
       }
-      return res.status(200).send(user);
+      return res.status(OK).send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -35,7 +36,7 @@ module.exports.createUser = (req, res) => {
 
   User.create({ name, about, avatar })
     .then((user) => {
-      res.status(200).send(user);
+      res.status(OK).send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -54,7 +55,7 @@ module.exports.updateUserInfo = (req, res) => {
       if (!user) {
         return res.status(NOT_FOUND_CODE).send({ message: STATUS.USER_NOT_FOUND });
       }
-      return res.status(200).send(user);
+      return res.status(OK).send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -73,7 +74,7 @@ module.exports.updateAvatar = (req, res) => {
       if (!user) {
         return res.status(NOT_FOUND_CODE).send({ message: STATUS.USER_NOT_FOUND });
       }
-      return res.status(200).send(user);
+      return res.status(OK).send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {

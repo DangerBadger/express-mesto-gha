@@ -17,7 +17,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-mongoose.connect(MESTO_DB_CONNECT); // Тест ругается на отсутсвие URI
+mongoose.connect(MESTO_DB_CONNECT);
 
 app.use((req, res, next) => {
   req.user = {
