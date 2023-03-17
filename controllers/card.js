@@ -1,18 +1,19 @@
-const STATUS = require('../utils/constants/status');
-const {
-  DEFAULT_CODE,
-  NOT_FOUND_CODE,
-  INVALID_DATA_CODE,
-  OK,
-} = require('../utils/constants/status-code');
 const Card = require('../models/card');
+const STATUS = require('../utils/constants/status');
+const ApplicationError = require('../errors/ApplicationError');
+const ValidationError = require('../errors/ValidationError');
+const NotFound = require('../errors/NotFound');
+const BadRequest = require('../errors/BadRequest');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
     .then((card) => {
-      res.status(OK).send(card);
+      res.status(200).send(card);
     })
-    .catch(() => res.status(DEFAULT_CODE).send({ message: STATUS.DEFAULT_ERROR }));
+    .catch(() => {
+      throw new ApplicationError();
+    })
+    .catch((err) => res.status(err.statusCode).send(err));
 };
 
 module.exports.createCard = (req, res) => {
@@ -21,14 +22,16 @@ module.exports.createCard = (req, res) => {
 
   Card.create({ name, link, owner })
     .then((card) => {
-      res.status(OK).send(card);
+      res.status(200).send(card);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(INVALID_DATA_CODE).send({ message: STATUS.INVALID_CARD_CREATE });
+        throw new ValidationError(STATUS.INVALID_CARD_CREATE);
+      } else {
+        throw new ApplicationError();
       }
-      return res.status(DEFAULT_CODE).send({ message: STATUS.DEFAULT_ERROR });
-    });
+    })
+    .catch((err) => res.status(err.statusCode).send(err));
 };
 
 module.exports.deleteCard = (req, res) => {
@@ -37,16 +40,21 @@ module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(cardId)
     .then((card) => {
       if (!card) {
-        return res.status(NOT_FOUND_CODE).send({ message: STATUS.CARD_NOT_FOUND });
+        throw new NotFound(STATUS.CARD_NOT_FOUND);
       }
-      return res.status(OK).send({ message: 'Карточка удалена' });
+      return res.status(200).send({ message: 'Карточка удалена' });
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        return res.status(INVALID_DATA_CODE).send({ message: STATUS.BAD_REQUEST });
+      if (err.name === 'NotFound') {
+        return res.status(err.statusCode).send(err);
       }
-      return res.status(DEFAULT_CODE).send({ message: STATUS.DEFAULT_ERROR });
-    });
+      if (err.name === 'CastError') {
+        throw new BadRequest(STATUS.BAD_REQUEST);
+      } else {
+        throw new ApplicationError();
+      }
+    })
+    .catch((err) => res.status(err.statusCode).send(err));
 };
 
 module.exports.likeCard = (req, res) => {
@@ -59,16 +67,21 @@ module.exports.likeCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        return res.status(NOT_FOUND_CODE).send({ message: STATUS.CARD_NOT_FOUND });
+        throw new NotFound(STATUS.CARD_NOT_FOUND);
       }
-      return res.status(OK).send(card);
+      return res.status(200).send(card);
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        return res.status(INVALID_DATA_CODE).send({ message: STATUS.BAD_LIKE_REQ });
+      if (err.name === 'NotFound') {
+        return res.status(err.statusCode).send(err);
       }
-      return res.status(DEFAULT_CODE).send({ message: STATUS.DEFAULT_ERROR });
-    });
+      if (err.name === 'CastError') {
+        throw new BadRequest(STATUS.BAD_LIKE_REQ);
+      } else {
+        throw new ApplicationError();
+      }
+    })
+    .catch((err) => res.status(err.statusCode).send(err));
 };
 
 module.exports.dislikeCard = (req, res) => {
@@ -81,14 +94,19 @@ module.exports.dislikeCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        return res.status(NOT_FOUND_CODE).send({ message: STATUS.CARD_NOT_FOUND });
+        throw new NotFound(STATUS.CARD_NOT_FOUND);
       }
-      return res.status(OK).send(card);
+      return res.status(200).send(card);
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        return res.status(INVALID_DATA_CODE).send({ message: STATUS.BAD_LIKE_REQ });
+      if (err.name === 'NotFound') {
+        return res.status(err.statusCode).send(err);
       }
-      return res.status(DEFAULT_CODE).send({ message: STATUS.DEFAULT_ERROR });
-    });
+      if (err.name === 'CastError') {
+        throw new BadRequest(STATUS.BAD_LIKE_REQ);
+      } else {
+        throw new ApplicationError();
+      }
+    })
+    .catch((err) => res.status(err.statusCode).send(err));
 };

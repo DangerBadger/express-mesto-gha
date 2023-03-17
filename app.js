@@ -1,8 +1,7 @@
 const express = require('express');
+const path = require('path');
 const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
-const userRouter = require('./routes/user');
-const cardRouter = require('./routes/card');
+const routes = require('./routes');
 const STATUS = require('./utils/constants/status');
 const { NOT_FOUND_CODE } = require('./utils/constants/status-code');
 
@@ -14,10 +13,12 @@ const { MESTO_DB_CONNECT = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
 
 const app = express();
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
 mongoose.connect(MESTO_DB_CONNECT);
+
+app.use(express.json()); /* Более актуальный способ парсинга */
+app.use(express.urlencoded({ extended: true }));
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((req, res, next) => {
   req.user = {
@@ -27,8 +28,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/users', userRouter);
-app.use('/cards', cardRouter);
+app.use(routes);
 app.use('*', (req, res) => res.status(NOT_FOUND_CODE).send({ message: STATUS.NOT_FOUND }));
 
 app.listen(PORT, () => {

@@ -1,34 +1,40 @@
-const STATUS = require('../utils/constants/status');
-const {
-  DEFAULT_CODE,
-  NOT_FOUND_CODE,
-  INVALID_DATA_CODE,
-  OK,
-} = require('../utils/constants/status-code');
 const User = require('../models/user');
+const STATUS = require('../utils/constants/status');
+const ApplicationError = require('../errors/ApplicationError');
+const NotFound = require('../errors/NotFound');
+const BadRequest = require('../errors/BadRequest');
+const ValidationError = require('../errors/ValidationError');
 
 module.exports.getUsers = (req, res) => {
   User.find({})
     .then((user) => {
-      res.status(OK).send(user);
+      res.status(200).send(user);
     })
-    .catch(() => res.status(DEFAULT_CODE).send({ message: STATUS.DEFAULT_ERROR }));
+    .catch(() => {
+      throw new ApplicationError();
+    })
+    .catch((err) => res.status(err.statusCode).send(err));
 };
 
 module.exports.getUser = (req, res) => {
   User.findById(req.params.id)
     .then((user) => {
       if (!user) {
-        return res.status(NOT_FOUND_CODE).send({ message: STATUS.USER_NOT_FOUND });
+        throw new NotFound(STATUS.USER_NOT_FOUND);
       }
-      return res.status(OK).send(user);
+      return res.status(200).send(user);
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        return res.status(INVALID_DATA_CODE).send({ message: STATUS.BAD_REQUEST });
+      if (err.name === 'NotFound') {
+        return res.status(err.statusCode).send(err);
       }
-      return res.status(DEFAULT_CODE).send({ message: STATUS.DEFAULT_ERROR });
-    });
+      if (err.name === 'CastError') {
+        throw new BadRequest(STATUS.BAD_REQUEST);
+      } else {
+        throw new ApplicationError();
+      }
+    })
+    .catch((err) => res.status(err.statusCode).send(err));
 };
 
 module.exports.createUser = (req, res) => {
@@ -36,14 +42,16 @@ module.exports.createUser = (req, res) => {
 
   User.create({ name, about, avatar })
     .then((user) => {
-      res.status(OK).send(user);
+      res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(INVALID_DATA_CODE).send({ message: STATUS.INVALID_USER });
+        throw new ValidationError(STATUS.INVALID_USER);
+      } else {
+        throw new ApplicationError();
       }
-      return res.status(DEFAULT_CODE).send({ message: STATUS.DEFAULT_ERROR });
-    });
+    })
+    .catch((err) => res.status(err.statusCode).send(err));
 };
 
 module.exports.updateUserInfo = (req, res) => {
@@ -53,16 +61,21 @@ module.exports.updateUserInfo = (req, res) => {
   User.findByIdAndUpdate(_id, { name, about }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
-        return res.status(NOT_FOUND_CODE).send({ message: STATUS.USER_NOT_FOUND });
+        throw new NotFound(STATUS.USER_NOT_FOUND);
       }
-      return res.status(OK).send(user);
+      return res.status(200).send(user);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return res.status(INVALID_DATA_CODE).send({ message: STATUS.INVALID_USER });
+      if (err.name === 'NotFound') {
+        return res.status(err.statusCode).send(err);
       }
-      return res.status(DEFAULT_CODE).send({ message: STATUS.DEFAULT_ERROR });
-    });
+      if (err.name === 'ValidationError') {
+        throw new ValidationError(STATUS.INVALID_INFO_UPDATE);
+      } else {
+        throw new ApplicationError();
+      }
+    })
+    .catch((err) => res.status(err.statusCode).send(err));
 };
 
 module.exports.updateAvatar = (req, res) => {
@@ -72,14 +85,19 @@ module.exports.updateAvatar = (req, res) => {
   User.findByIdAndUpdate(_id, { avatar }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
-        return res.status(NOT_FOUND_CODE).send({ message: STATUS.USER_NOT_FOUND });
+        throw new NotFound(STATUS.USER_NOT_FOUND);
       }
-      return res.status(OK).send(user);
+      return res.status(200).send(user);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return res.status(INVALID_DATA_CODE).send({ message: STATUS.INVALID_AVATAR_UPDATE });
+      if (err.name === 'NotFound') {
+        return res.status(err.statusCode).send(err);
       }
-      return res.status(DEFAULT_CODE).send({ message: STATUS.DEFAULT_ERROR });
-    });
+      if (err.name === 'ValidationError') {
+        throw new ValidationError(STATUS.INVALID_AVATAR_UPDATE);
+      } else {
+        throw new ApplicationError();
+      }
+    })
+    .catch((err) => res.status(err.statusCode).send(err));
 };
