@@ -1,3 +1,4 @@
+const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const STATUS = require('../utils/constants/status');
 const ApplicationError = require('../errors/ApplicationError');
@@ -38,11 +39,30 @@ module.exports.getUser = (req, res) => {
 };
 
 module.exports.createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
+  const {
+    name,
+    about,
+    avatar,
+    email,
+    password,
+  } = req.body;
 
-  User.create({ name, about, avatar })
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
+    }))
     .then((user) => {
-      res.status(200).send(user);
+      res.status(200).send({
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+        email: user.email,
+        _id: user._id,
+      });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -100,4 +120,35 @@ module.exports.updateAvatar = (req, res) => {
       }
     })
     .catch((err) => res.status(err.statusCode).send(err));
+};
+
+module.exports.login = (req, res) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+
+    })
+    .catch((err) => {
+      res.status(401).send({ message: err.message });
+    });
+
+  // User.findOne({ email })
+  //   .then((user) => {
+  //     if (!user) {
+  //       throw new NotFound('Неверная почта или пароль');
+  //     }
+  //     return bcrypt.compare(password, user.password);
+  //   })
+  //   .catch((err) => {
+  //     if (err.name === 'NotFound') {
+  //       return res.status(401).send(err);
+  //     }
+  //     if (err.name === 'ValidationError') {
+  //       throw new ValidationError(STATUS.INVALID_AVATAR_UPDATE);
+  //     } else {
+  //       throw new ApplicationError();
+  //     }
+  //   })
+  //   .catch((err) => res.status(err.statusCode).send(err));
 };
