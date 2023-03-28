@@ -29,12 +29,11 @@ module.exports.getUserById = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadRequest(STATUS.BAD_REQUEST);
+        next(new BadRequest(STATUS.BAD_REQUEST));
       } else {
         next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 module.exports.getUserInfo = (req, res, next) => {
@@ -53,8 +52,7 @@ module.exports.getUserInfo = (req, res, next) => {
       } else {
         next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 module.exports.createUser = (req, res, next) => {
