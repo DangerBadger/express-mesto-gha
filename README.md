@@ -1,4 +1,4 @@
-[![Tests](https://github.com/DangerBadger/express-mesto-gha/actions/workflows/tests-13-sprint.yml/badge.svg)](../../actions/workflows/tests-13-sprint.yml) [![Tests](../../actions/workflows/tests-14-sprint.yml/badge.svg)](../../actions/workflows/tests-14-sprint.yml)
+[![Tests](../../actions/workflows/tests-14-sprint.yml/badge.svg)](../../actions/workflows/tests-14-sprint.yml)
 # Проект Mesto фронтенд + бэкенд
 
 Ссылка на репозиторий: https://github.com/DangerBadger/express-mesto-gha

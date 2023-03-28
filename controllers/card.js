@@ -36,10 +36,10 @@ module.exports.deleteCard = (req, res, next) => {
   Card.findById(cardId)
     .then((card) => {
       if (!card) {
-        throw new NotFound(STATUS.CARD_NOT_FOUND);
+        next(new NotFound(STATUS.CARD_NOT_FOUND));
       }
       if (card.owner.toString() !== req.user._id) {
-        throw new Forbidden(STATUS.FORBIDDEN_CARD);
+        next(new Forbidden(STATUS.FORBIDDEN_CARD));
       }
       if (card && (card.owner.toString() === req.user._id)) {
         Card.findByIdAndDelete(cardId)
@@ -47,7 +47,7 @@ module.exports.deleteCard = (req, res, next) => {
             res.status(200).send({ message: 'Карточка удалена' });
           });
       } else {
-        throw new Error();
+        next(new Error());
       }
     })
     .catch(next);
@@ -63,7 +63,7 @@ module.exports.likeCard = (req, res, next) => {
   )
     .then((card) => {
       if (!card) {
-        throw new NotFound(STATUS.CARD_NOT_FOUND);
+        next(new NotFound(STATUS.CARD_NOT_FOUND));
       }
       return res.status(200).send(card);
     })
@@ -86,7 +86,7 @@ module.exports.dislikeCard = (req, res, next) => {
   )
     .then((card) => {
       if (!card) {
-        throw new NotFound(STATUS.CARD_NOT_FOUND);
+        next(new NotFound(STATUS.CARD_NOT_FOUND));
       }
       return res.status(200).send(card);
     })
