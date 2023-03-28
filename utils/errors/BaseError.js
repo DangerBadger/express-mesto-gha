@@ -1,4 +1,4 @@
-class ApplicationError extends Error {
+class BaseError extends Error {
   constructor(status = 500, message = 'На сервере произошла ошибка') {
     super();
     this.statusCode = status;
@@ -9,4 +9,4 @@ class ApplicationError extends Error {
   }
 }
 
-module.exports = ApplicationError;
+module.exports = BaseError;

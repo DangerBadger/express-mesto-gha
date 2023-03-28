@@ -1,22 +1,19 @@
 const Card = require('../models/card');
 const STATUS = require('../utils/constants/status');
-const ApplicationError = require('../errors/ApplicationError');
-const ValidationError = require('../errors/ValidationError');
-const NotFound = require('../errors/NotFound');
-const BadRequest = require('../errors/BadRequest');
+const ValidationError = require('../utils/errors/ValidationError');
+const NotFound = require('../utils/errors/NotFound');
+const BadRequest = require('../utils/errors/BadRequest');
+const Forbidden = require('../utils/errors/Forbidden');
 
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (req, res, next) => {
   Card.find({})
     .then((card) => {
       res.status(200).send(card);
     })
-    .catch(() => {
-      throw new ApplicationError();
-    })
-    .catch((err) => res.status(err.statusCode).send(err));
+    .catch(next);
 };
 
-module.exports.createCard = (req, res) => {
+module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user._id;
 
@@ -26,38 +23,37 @@ module.exports.createCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new ValidationError(STATUS.INVALID_CARD_CREATE);
+        next(new ValidationError(STATUS.INVALID_CARD_CREATE));
       } else {
-        throw new ApplicationError();
+        next(err);
       }
-    })
-    .catch((err) => res.status(err.statusCode).send(err));
+    });
 };
 
-module.exports.deleteCard = (req, res) => {
+module.exports.deleteCard = (req, res, next) => {
   const { cardId } = req.params;
 
-  Card.findByIdAndRemove(cardId)
+  Card.findById(cardId)
     .then((card) => {
       if (!card) {
         throw new NotFound(STATUS.CARD_NOT_FOUND);
       }
-      return res.status(200).send({ message: 'Карточка удалена' });
-    })
-    .catch((err) => {
-      if (err.name === 'NotFound') {
-        return res.status(err.statusCode).send(err);
+      if (card.owner.toString() !== req.user._id) {
+        throw new Forbidden(STATUS.FORBIDDEN_CARD);
       }
-      if (err.name === 'CastError') {
-        throw new BadRequest(STATUS.BAD_REQUEST);
+      if (card && (card.owner.toString() === req.user._id)) {
+        Card.findByIdAndDelete(cardId)
+          .then(() => {
+            res.status(200).send({ message: 'Карточка удалена' });
+          });
       } else {
-        throw new ApplicationError();
+        throw new Error();
       }
     })
-    .catch((err) => res.status(err.statusCode).send(err));
+    .catch(next);
 };
 
-module.exports.likeCard = (req, res) => {
+module.exports.likeCard = (req, res, next) => {
   const { cardId } = req.params;
 
   Card.findByIdAndUpdate(
@@ -72,19 +68,15 @@ module.exports.likeCard = (req, res) => {
       return res.status(200).send(card);
     })
     .catch((err) => {
-      if (err.name === 'NotFound') {
-        return res.status(err.statusCode).send(err);
-      }
       if (err.name === 'CastError') {
-        throw new BadRequest(STATUS.BAD_LIKE_REQ);
+        next(new BadRequest(STATUS.BAD_LIKE_REQ));
       } else {
-        throw new ApplicationError();
+        next(err);
       }
-    })
-    .catch((err) => res.status(err.statusCode).send(err));
+    });
 };
 
-module.exports.dislikeCard = (req, res) => {
+module.exports.dislikeCard = (req, res, next) => {
   const { cardId } = req.params;
 
   Card.findByIdAndUpdate(
@@ -99,14 +91,10 @@ module.exports.dislikeCard = (req, res) => {
       return res.status(200).send(card);
     })
     .catch((err) => {
-      if (err.name === 'NotFound') {
-        return res.status(err.statusCode).send(err);
-      }
       if (err.name === 'CastError') {
-        throw new BadRequest(STATUS.BAD_LIKE_REQ);
+        next(new BadRequest(STATUS.BAD_LIKE_REQ));
       } else {
-        throw new ApplicationError();
+        next(err);
       }
-    })
-    .catch((err) => res.status(err.statusCode).send(err));
+    });
 };

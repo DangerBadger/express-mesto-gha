@@ -9,6 +9,10 @@ const STATUS = {
   INVALID_INFO_UPDATE: 'Переданы некорректные данные при обновлении профиля',
   INVALID_AVATAR_UPDATE: 'Переданы некорректные данные при обновлении аватара',
   INVALID_CARD_CREATE: 'Переданы некорректные данные при создании карточки',
+  FORBIDDEN_CARD: 'У вас нет прав для удаления этой карточки',
+  CONFLICT_EMAIL: 'Пользователь с данным email уже зарегистрирован',
+  UNAUTHORIZED_USER: 'Необходима авторизация',
+  UNAUTHORIZED_MAIL_PASSWORD: 'Неправильные почта или пароль',
 };
 
 module.exports = STATUS;
