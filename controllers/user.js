@@ -120,7 +120,7 @@ module.exports.login = (req, res, next) => {
           httpOnly: true,
           sameSite: true,
         })
-        .send({ token });
+        .send({ message: 'Вы успешно авторизованы' });
     })
     .catch(next);
 };
