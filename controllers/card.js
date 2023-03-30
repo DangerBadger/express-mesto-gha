@@ -43,12 +43,10 @@ module.exports.deleteCard = (req, res, next) => {
       if (card.owner.toString() !== req.user._id) {
         throw new Forbidden(STATUS.FORBIDDEN_CARD);
       }
-      if (card.owner.toString() === req.user._id) {
-        return Card.deleteOne({ _id: cardId })
-          .then(() => {
-            res.status(200).send({ message: 'Карточка удалена' });
-          });
-      }
+      return Card.deleteOne({ _id: cardId })
+        .then(() => {
+          res.status(200).send({ message: 'Карточка удалена' });
+        });
     })
     .catch((err) => {
       if (err instanceof Error.CastError) {
