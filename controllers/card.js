@@ -1,12 +1,13 @@
+const { Error } = require('mongoose');
 const Card = require('../models/card');
 const STATUS = require('../utils/constants/status');
-const ValidationError = require('../utils/errors/ValidationError');
 const NotFound = require('../utils/errors/NotFound');
 const BadRequest = require('../utils/errors/BadRequest');
 const Forbidden = require('../utils/errors/Forbidden');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
+    .populate(['owner', 'likes'])
     .then((card) => {
       res.status(200).send(card);
     })
@@ -19,11 +20,11 @@ module.exports.createCard = (req, res, next) => {
 
   Card.create({ name, link, owner })
     .then((card) => {
-      res.status(200).send(card);
+      res.status(201).send(card);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        next(new ValidationError(STATUS.INVALID_CARD_CREATE));
+      if (err instanceof Error.ValidationError) {
+        next(new BadRequest(STATUS.INVALID_CARD_CREATE));
       } else {
         next(err);
       }
@@ -34,6 +35,7 @@ module.exports.deleteCard = (req, res, next) => {
   const { cardId } = req.params;
 
   Card.findById(cardId)
+  // eslint-disable-next-line consistent-return
     .then((card) => {
       if (!card) {
         throw new NotFound(STATUS.CARD_NOT_FOUND);
@@ -41,16 +43,20 @@ module.exports.deleteCard = (req, res, next) => {
       if (card.owner.toString() !== req.user._id) {
         throw new Forbidden(STATUS.FORBIDDEN_CARD);
       }
-      if (card && (card.owner.toString() === req.user._id)) {
-        Card.findByIdAndDelete(cardId)
+      if (card.owner.toString() === req.user._id) {
+        return Card.deleteOne({ _id: cardId })
           .then(() => {
             res.status(200).send({ message: 'Карточка удалена' });
           });
-      } else {
-        throw new Error();
       }
     })
-    .catch(next);
+    .catch((err) => {
+      if (err instanceof Error.CastError) {
+        next(new BadRequest(STATUS.BAD_REQUEST));
+      } else {
+        next(err);
+      }
+    });
 };
 
 module.exports.likeCard = (req, res, next) => {
@@ -68,7 +74,7 @@ module.exports.likeCard = (req, res, next) => {
       return res.status(200).send(card);
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err instanceof Error.CastError) {
         next(new BadRequest(STATUS.BAD_LIKE_REQ));
       } else {
         next(err);
@@ -91,7 +97,7 @@ module.exports.dislikeCard = (req, res, next) => {
       return res.status(200).send(card);
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err instanceof Error.CastError) {
         next(new BadRequest(STATUS.BAD_LIKE_REQ));
       } else {
         next(err);

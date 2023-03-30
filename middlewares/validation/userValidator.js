@@ -26,13 +26,13 @@ module.exports.userByIdValidation = celebrate({
 
 module.exports.userInfoValidation = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
+    name: Joi.string().required().min(2).max(30),
     about: Joi.string().min(2).max(30),
   }),
 });
 
 module.exports.avatarValidation = celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().pattern(URL_REGEXP),
+    avatar: Joi.string().required().pattern(URL_REGEXP),
   }),
 });
