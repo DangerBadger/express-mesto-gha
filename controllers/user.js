@@ -37,7 +37,7 @@ module.exports.getUserInfo = (req, res, next) => {
 
 module.exports.createUser = (req, res, next) => {
   const {
-    name,
+    name = undefined,
     about,
     avatar,
     email,
